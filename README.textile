@@ -1,0 +1,8 @@
+
+This is basically the stock screenshot plugin with the following modifications:
+* there is no modal options box (it will always use bounds/rectangular selection over whole-window or whole-screen)
+* it can be activated with a keyboard shortcut (Ctrl-Shift-U)
+* it can be activated by clicking a toolbar button
+* the files in creates will be named with the page path rather than a static 'screenshot*' prefix
+** e.g. snapping a screenshot into the ":Bob:Jones" page will yield a file named "Bob-Jones-{DATE}-{TIME}.png"
+
