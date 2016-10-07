@@ -194,7 +194,7 @@ class MainWindowExtension(WindowExtension):
 
 		def callback(status, tmpfile):
 			if status == helper.STATUS_OK:
-				name = prefix+'-'+("%x" % time.time())
+				name = prefix+'-'+("%x" % time.time())+'.png'
 				imgdir = notebook.get_attachments_dir(page)
 				imgfile = imgdir.new_file(name)
 				tmpfile.rename(imgfile)
