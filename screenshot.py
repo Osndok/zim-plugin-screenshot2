@@ -114,6 +114,7 @@ core plugin that ships with zim with the same name.
 	}
 	plugin_preferences = (
 		# key, type, label, default
+		('autohide', 'bool', _('Hide zim when taking a screenshot (good for small/single-monitor setups).'), False),
 		('screenshot_command', 'choice', _('Screenshot Command'), COMMAND, SUPPORTED_COMMANDS), # T: plugin preference
 	)
 	screenshot_cmd = COMMAND
@@ -193,6 +194,8 @@ class MainWindowExtension(WindowExtension):
 		helper = Application((self.screenshot_command,) + options)
 
 		def callback(status, tmpfile):
+			if self.plugin.preferences['autohide']:
+				self.window.present()
 			if status == helper.STATUS_OK:
 				name = prefix+'-'+("%x" % time.time())+'.png'
 				imgdir = notebook.get_attachments_dir(page)
@@ -207,4 +210,8 @@ class MainWindowExtension(WindowExtension):
 
 		tmpfile.dir.touch()
 		helper.spawn((tmpfile,), callback, tmpfile)
+
+		if self.plugin.preferences['autohide']:
+			self.window.iconify()
+
 		return True
