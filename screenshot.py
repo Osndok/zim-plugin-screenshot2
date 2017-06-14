@@ -201,7 +201,10 @@ class MainWindowExtension(WindowExtension):
 				imgdir = notebook.get_attachments_dir(page)
 				imgfile = imgdir.new_file(name)
 				tmpfile.rename(imgfile)
-				pageview = self.window.ui.mainwindow.pageview
+				if hasattr(self.window.ui, 'mainwindow'):
+					pageview = self.window.ui.mainwindow.pageview
+				else:
+					pageview = self.window.pageview
 				pageview.insert_image(imgfile, interactive=False, force=True)
 			else:
 				ErrorDialog(self.window.ui,
