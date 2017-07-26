@@ -5,6 +5,7 @@
 
 
 import time
+import logging
 from platform import os
 
 import gtk
@@ -15,6 +16,7 @@ from zim.fs import TmpFile
 from zim.applications import Application
 from zim.gui.widgets import ui_environment, Dialog, ErrorDialog
 
+logger = logging.getLogger('zim.plugin.screenshot')
 
 PLATFORM = os.name
 if ui_environment['platform'] == 'maemo':  # don't know what os.name return on maemo
@@ -162,6 +164,7 @@ class MainWindowExtension(WindowExtension):
 	'''
 	screenshot_command = COMMAND
 	plugin = None
+	pngquant = Application('pngquant')
 
 	def __init__(self, plugin, window):
 		WindowExtension.__init__(self, plugin, window)
@@ -200,7 +203,15 @@ class MainWindowExtension(WindowExtension):
 				name = prefix+'-'+("%x" % time.time())+'.png'
 				imgdir = notebook.get_attachments_dir(page)
 				imgfile = imgdir.new_file(name)
-				tmpfile.rename(imgfile)
+				if self.pngquant.tryexec():
+					imgfile.parent().touch();
+					self.pngquant.run(('--skip-if-larger',tmpfile,'--output',imgfile,))
+					if os.path.isfile(imgfile.encodedpath):
+						logger.info("png8 conversion successful")
+					else:
+						tmpfile.rename(imgfile);
+				else:
+					tmpfile.rename(imgfile)
 				if hasattr(self.window.ui, 'mainwindow'):
 					pageview = self.window.ui.mainwindow.pageview
 				else:
