@@ -13,7 +13,7 @@ import gtk
 from zim.plugins import PluginClass, WindowExtension, extends
 from zim.actions import action
 from zim.fs import TmpFile
-from zim.applications import Application
+from zim.applications import Application, ApplicationError
 from zim.gui.widgets import ui_environment, Dialog, ErrorDialog
 
 logger = logging.getLogger('zim.plugin.screenshot')
@@ -205,10 +205,14 @@ class MainWindowExtension(WindowExtension):
 				imgfile = imgdir.new_file(name)
 				if self.pngquant.tryexec():
 					imgfile.parent().touch();
-					self.pngquant.run(('--skip-if-larger',tmpfile,'--output',imgfile,))
-					if os.path.isfile(imgfile.encodedpath):
-						logger.info("png8 conversion successful")
-					else:
+					try:
+						self.pngquant.run(('--skip-if-larger',tmpfile,'--output',imgfile,))
+						if os.path.isfile(imgfile.encodedpath):
+							logger.info("png8 conversion successful")
+						else:
+							tmpfile.rename(imgfile);
+					except ApplicationError as e:
+						# pngquant returns 98 if the resulting file would be larger, which throws an exception
 						tmpfile.rename(imgfile);
 				else:
 					tmpfile.rename(imgfile)
