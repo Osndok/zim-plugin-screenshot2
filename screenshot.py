@@ -165,6 +165,7 @@ class MainWindowExtension(WindowExtension):
 	screenshot_command = COMMAND
 	plugin = None
 	pngquant = Application('pngquant')
+	onImageInserted = Application('zim-on-image-inserted')
 
 	def __init__(self, plugin, window):
 		WindowExtension.__init__(self, plugin, window)
@@ -216,11 +217,18 @@ class MainWindowExtension(WindowExtension):
 						tmpfile.rename(imgfile);
 				else:
 					tmpfile.rename(imgfile)
+
 				if hasattr(self.window.ui, 'mainwindow'):
 					pageview = self.window.ui.mainwindow.pageview
 				else:
 					pageview = self.window.pageview
+
 				pageview.insert_image(imgfile, interactive=False, force=True)
+
+				if self.onImageInserted.tryexec():
+					self.onImageInserted.run((imgfile, page.name));
+				else:
+					logger.debug("dne: %s"%self.onImageInserted);
 			else:
 				ErrorDialog(self.window.ui,
 							_('Some error occurred while running "%s"') % self.screenshot_command).run()
