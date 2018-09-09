@@ -226,7 +226,7 @@ class MainWindowExtension(WindowExtension):
 				pageview.insert_image(imgfile, interactive=False, force=True)
 
 				if self.onImageInserted.tryexec():
-					self.onImageInserted.run((imgfile, page.name));
+					self.onImageInserted.run((imgfile, notebook.dir, page.name));
 				else:
 					logger.debug("dne: %s"%self.onImageInserted);
 			else:
