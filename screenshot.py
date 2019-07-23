@@ -6,6 +6,7 @@
 
 import time
 import logging
+import platform
 from platform import os
 
 import gtk
@@ -33,13 +34,18 @@ UNTESTED:
 COMMAND = 'import'
 SUPPORTED_COMMANDS_BY_PLATFORM = dict([
 	('posix', ('import', 'scrot')),
-	('nt', ('boxcutter',)),
+	('nt', ('boxcutter', 'i_view32.exe', 'i_view64.exe')),
 	('maemo', ('screenshot-tool',)),
 ])
 SUPPORTED_COMMANDS = SUPPORTED_COMMANDS_BY_PLATFORM[PLATFORM]
 if len(SUPPORTED_COMMANDS):
 	COMMAND = SUPPORTED_COMMANDS[0]  # set first available tool as default
 
+#WSL='Microsoft' in platform.uname().release;
+WSL='Microsoft' in platform.uname()[3];
+
+if PLATFORM == 'posix' and WSL:
+	SUPPORTED_COMMANDS=SUPPORTED_COMMANDS+SUPPORTED_COMMANDS_BY_PLATFORM['nt']
 
 class ScreenshotPicker(object):
 	cmd_options = dict([
@@ -52,6 +58,18 @@ class ScreenshotPicker(object):
 			'select': ('-silent',),
 			'full': ('-silent', '-window', 'root'),
 			'delay': '-delay',
+		}),
+		('i_view32.exe', {
+			'select': ('/capture=4',),
+			'full': ('/capture=0'),
+			'delay': None,
+			'savePrefix': '/convert=',
+		}),
+		('i_view64.exe', {
+			'select': ('/capture=4',),
+			'full': ('/capture=0'),
+			'delay': None,
+			'savePrefix': '/convert=',
 		}),
 		('boxcutter', {
 			'select': None,
@@ -234,8 +252,13 @@ class MainWindowExtension(WindowExtension):
 							_('Some error occurred while running "%s"') % self.screenshot_command).run()
 				# T: Error message in "insert screenshot" dialog, %s will be replaced by application name
 
+		savePrefix = '';
+		options=ScreenshotPicker(COMMAND).cmd_options[self.screenshot_command];
+		if 'savePrefix' in options:
+			savePrefix = options['savePrefix'];
+
 		tmpfile.dir.touch()
-		helper.spawn((tmpfile,), callback, tmpfile)
+		helper.spawn((savePrefix+tmpfile.basename,), callback, tmpfile, tmpfile.dir)
 
 		if self.plugin.preferences['autohide']:
 			self.window.iconify()
