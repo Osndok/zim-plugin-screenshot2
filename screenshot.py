@@ -42,9 +42,10 @@ if len(SUPPORTED_COMMANDS):
 	COMMAND = SUPPORTED_COMMANDS[0]  # set first available tool as default
 
 #WSL='Microsoft' in platform.uname().release;
-WSL='Microsoft' in platform.uname()[3];
+WSL1='Microsoft' in platform.uname()[3];
+WSL2='microsoft' in platform.uname()[2];
 
-if PLATFORM == 'posix' and WSL:
+if PLATFORM == 'posix' and ( WSL1 or WSL2 ):
 	SUPPORTED_COMMANDS=SUPPORTED_COMMANDS+SUPPORTED_COMMANDS_BY_PLATFORM['nt']
 
 class ScreenshotPicker(object):
