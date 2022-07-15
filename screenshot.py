@@ -33,7 +33,7 @@ UNTESTED:
 """
 COMMAND = 'import'
 SUPPORTED_COMMANDS_BY_PLATFORM = dict([
-	('posix', ('import', 'scrot')),
+	('posix', ('import', 'scrot', 'screencapture')),
 	('nt', ('boxcutter', 'i_view32.exe', 'i_view64.exe')),
 	('maemo', ('screenshot-tool',)),
 ])
@@ -75,6 +75,11 @@ class ScreenshotPicker(object):
 		('boxcutter', {
 			'select': None,
 			'full': ('--fullscreen',),
+			'delay': None,
+		}),
+		('screencapture', {
+			'select': ('-xs'),
+			'full': None,
 			'delay': None,
 		}),
 		('screenshot-tool', {
